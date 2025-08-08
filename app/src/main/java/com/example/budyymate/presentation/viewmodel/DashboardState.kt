@@ -10,5 +10,8 @@ data class DashboardState(
     val totalBalance: Double = 0.0,
     val totalIncome: Double = 0.0,
     val totalExpense: Double = 0.0,
+    val weeklyExpenses: Map<String, Double> = emptyMap(), // Kategori bazlı haftalık harcamalar
+    val weeklyIncome: Double = 0.0,
+    val weeklyExpense: Double = 0.0,
     val error: String? = null
 ) 

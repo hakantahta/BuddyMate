@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.*
 
 class DashboardViewModel(
     private val getAllTransactionsUseCase: GetAllTransactionsUseCase,
@@ -34,6 +35,9 @@ class DashboardViewModel(
                 val totalExpense = transactions.filter { it.amount < 0 }.sumOf { -it.amount }
                 val totalBalance = totalIncome - totalExpense
                 
+                // Haftalık verileri hesapla
+                val weeklyData = calculateWeeklyData(transactions)
+                
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -41,7 +45,10 @@ class DashboardViewModel(
                         categories = categories,
                         totalBalance = totalBalance,
                         totalIncome = totalIncome,
-                        totalExpense = totalExpense
+                        totalExpense = totalExpense,
+                        weeklyExpenses = weeklyData.expenses,
+                        weeklyIncome = weeklyData.income,
+                        weeklyExpense = weeklyData.expense
                     )
                 }
             } catch (e: Exception) {
@@ -55,7 +62,47 @@ class DashboardViewModel(
         }
     }
 
+    private fun calculateWeeklyData(transactions: List<com.example.budyymate.domain.model.Transaction>): WeeklyData {
+        val calendar = Calendar.getInstance()
+        val currentWeekStart = calendar.apply {
+            set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        
+        val currentWeekEnd = currentWeekStart + (7 * 24 * 60 * 60 * 1000) - 1
+        
+        val weeklyTransactions = transactions.filter { 
+            it.date in currentWeekStart..currentWeekEnd 
+        }
+        
+        val weeklyIncome = weeklyTransactions.filter { it.amount > 0 }.sumOf { it.amount }
+        val weeklyExpense = weeklyTransactions.filter { it.amount < 0 }.sumOf { -it.amount }
+        
+        // Kategori bazlı harcamaları hesapla
+        val weeklyExpenses = weeklyTransactions
+            .filter { it.amount < 0 } // Sadece harcamalar
+            .groupBy { it.categoryName }
+            .mapValues { (_, transactions) -> 
+                transactions.sumOf { -it.amount } 
+            }
+        
+        return WeeklyData(
+            income = weeklyIncome,
+            expense = weeklyExpense,
+            expenses = weeklyExpenses
+        )
+    }
+
     fun refresh() {
         loadDashboardData()
     }
+
+    private data class WeeklyData(
+        val income: Double,
+        val expense: Double,
+        val expenses: Map<String, Double>
+    )
 } 
