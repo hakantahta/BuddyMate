@@ -201,17 +201,27 @@ fun SettingsScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
                         Text(
-                            text = if (state.notificationsEnabled) "🔔 Bildirimler" else "🔕 Bildirimler",
+                            text = if (state.notificationsEnabled) "🔔 Günlük Hatırlatma" else "🔕 Günlük Hatırlatma",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = if (state.notificationsEnabled) "Bildirimler aktif" else "Bildirimler kapalı",
+                            text = if (state.notificationsEnabled) "Her gün 21:00'de hatırlatma" else "Bildirimler kapalı",
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        if (state.notificationsEnabled) {
+                            Text(
+                                text = "💡 'Bugünkü harcamaları eklediniz mi?' mesajı gönderilir",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
                     Switch(
                         checked = state.notificationsEnabled,

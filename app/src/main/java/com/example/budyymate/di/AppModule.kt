@@ -9,6 +9,7 @@ import com.example.budyymate.data.local.datastore.UserPreferencesManager
 import com.example.budyymate.data.repository.BudgetRepositoryImpl
 import com.example.budyymate.domain.repository.BudgetRepository
 import com.example.budyymate.domain.usecase.*
+import com.example.budyymate.notification.AlarmScheduler
 import com.example.budyymate.presentation.viewmodel.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -44,6 +45,9 @@ val appModule = module {
     // UserPreferencesManager
     single { UserPreferencesManager(androidContext()) }
 
+    // AlarmScheduler
+    single { AlarmScheduler(androidContext()) }
+
     // ViewModels
     factory { DashboardViewModel(get(), get()) }
 
@@ -53,5 +57,5 @@ val appModule = module {
 
     factory { AddTransactionViewModel(get(), get()) }
 
-    factory { SettingsViewModel(get()) }
+    factory { SettingsViewModel(get(), get()) }
 }

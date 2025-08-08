@@ -3,6 +3,7 @@ package com.example.budyymate.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.budyymate.data.local.datastore.UserPreferencesManager
+import com.example.budyymate.notification.AlarmScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val userPreferencesManager: UserPreferencesManager
+    private val userPreferencesManager: UserPreferencesManager,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
@@ -30,6 +32,13 @@ class SettingsViewModel(
                         language = preferences.language,
                         notificationsEnabled = preferences.notificationsEnabled
                     )
+                }
+                
+                // Bildirim ayarına göre alarm'ı ayarla
+                if (preferences.notificationsEnabled) {
+                    alarmScheduler.scheduleDailyReminder()
+                } else {
+                    alarmScheduler.cancelDailyReminder()
                 }
             }
         }
@@ -66,6 +75,13 @@ class SettingsViewModel(
         
         viewModelScope.launch {
             userPreferencesManager.updateNotificationsEnabled(newValue)
+            
+            // Bildirim ayarına göre alarm'ı ayarla
+            if (newValue) {
+                alarmScheduler.scheduleDailyReminder()
+            } else {
+                alarmScheduler.cancelDailyReminder()
+            }
         }
     }
 
