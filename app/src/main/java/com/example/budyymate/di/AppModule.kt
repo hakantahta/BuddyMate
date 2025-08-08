@@ -8,47 +8,34 @@ import com.example.budyymate.data.local.dao.CategoryDao
 import com.example.budyymate.data.repository.BudgetRepositoryImpl
 import com.example.budyymate.domain.repository.BudgetRepository
 import com.example.budyymate.domain.usecase.*
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.android.ext.koin.androidContext
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object AppModule {
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): BudgetDatabase =
+val appModule = module {
+    single {
         Room.databaseBuilder(
-            context,
+            androidContext(),
             BudgetDatabase::class.java,
             "budget_db"
         ).build()
+    }
 
-    @Provides
-    fun provideTransactionDao(db: BudgetDatabase): TransactionDao = db.transactionDao()
+    single { get<BudgetDatabase>().transactionDao() }
 
-    @Provides
-    fun provideCategoryDao(db: BudgetDatabase): CategoryDao = db.categoryDao()
+    single { get<BudgetDatabase>().categoryDao() }
 
-    @Provides
-    @Singleton
-    fun provideBudgetRepository(
-        transactionDao: TransactionDao,
-        categoryDao: CategoryDao
-    ): BudgetRepository = BudgetRepositoryImpl(transactionDao, categoryDao)
+    single<BudgetRepository> {
+        BudgetRepositoryImpl(
+            transactionDao = get(),
+            categoryDao = get()
+        )
+    }
 
-    @Provides
-    fun provideGetAllTransactionsUseCase(repository: BudgetRepository) = GetAllTransactionsUseCase(repository)
+    factory { GetAllTransactionsUseCase(get()) }
 
-    @Provides
-    fun provideAddTransactionUseCase(repository: BudgetRepository) = AddTransactionUseCase(repository)
+    factory { AddTransactionUseCase(get()) }
 
-    @Provides
-    fun provideGetCategoriesUseCase(repository: BudgetRepository) = GetCategoriesUseCase(repository)
+    factory { GetCategoriesUseCase(get()) }
 
-    @Provides
-    fun provideAddCategoryUseCase(repository: BudgetRepository) = AddCategoryUseCase(repository)
+    factory { AddCategoryUseCase(get()) }
 }
