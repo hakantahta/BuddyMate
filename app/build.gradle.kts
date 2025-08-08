@@ -69,6 +69,7 @@ dependencies {
     // Coroutines + Lifecycle + Flow
     implementation(libs.coroutines.android)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
     // Navigation Compose
     implementation(libs.navigation.compose)
     // DataStore

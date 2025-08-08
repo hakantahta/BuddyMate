@@ -17,7 +17,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         composable(Routes.DASHBOARD) { DashboardScreen() }
         composable(Routes.TRANSACTIONS) { TransactionsScreen() }
         composable(Routes.ADD_TRANSACTION) { AddTransactionScreen() }
-        composable(Routes.CATEGORIES) { CategoriesScreen() }
+        composable(Routes.CATEGORIES) { CategoriesScreen(navController = navController) }
         composable(Routes.SETTINGS) { SettingsScreen() }
     }
 }
