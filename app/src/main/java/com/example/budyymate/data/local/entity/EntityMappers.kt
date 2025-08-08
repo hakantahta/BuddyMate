@@ -10,7 +10,8 @@ fun TransactionEntity.toDomain() = Transaction(
     categoryName = categoryName,
     amount = amount,
     description = description,
-    date = date
+    date = date,
+    type = type
 )
 
 fun Transaction.toEntity() = TransactionEntity(
@@ -20,7 +21,8 @@ fun Transaction.toEntity() = TransactionEntity(
     categoryName = categoryName,
     amount = amount,
     description = description,
-    date = date
+    date = date,
+    type = type
 )
 
 fun CategoryEntity.toDomain() = Category(

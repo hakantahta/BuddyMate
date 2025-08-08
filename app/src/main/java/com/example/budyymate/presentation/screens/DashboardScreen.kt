@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
+import com.example.budyymate.presentation.navigation.Routes
 import com.example.budyymate.presentation.viewmodel.DashboardViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
@@ -28,6 +30,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    navController: NavController? = null,
     viewModel: DashboardViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -52,6 +55,128 @@ fun DashboardScreen(
                 )
                 IconButton(onClick = { viewModel.refresh() }) {
                     Icon(Icons.Default.Refresh, contentDescription = "Yenile")
+                }
+            }
+        }
+
+        // Hızlı Erişim Butonları
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "🚀 Hızlı Erişim",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Harcama Ekle Butonu
+                        Button(
+                            onClick = { navController?.navigate(Routes.ADD_TRANSACTION) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Harcama Ekle",
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        // Harcamaları Görüntüle Butonu
+                        Button(
+                            onClick = { navController?.navigate(Routes.TRANSACTIONS) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.List,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Harcamalar",
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Kategoriler Butonu
+                        Button(
+                            onClick = { navController?.navigate(Routes.CATEGORIES) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary
+                            )
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.List,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Kategoriler",
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        // Ayarlar Butonu
+                        Button(
+                            onClick = { navController?.navigate(Routes.SETTINGS) },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Ayarlar",
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -206,7 +331,7 @@ fun DashboardScreen(
             }
         }
 
-        // Kategori Bazlı Harcama Grafiği
+        // Haftalık Harcama Grafiği
         if (state.weeklyExpenses.isNotEmpty()) {
             item {
                 Card(
@@ -216,10 +341,10 @@ fun DashboardScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Kategori Bazlı Harcamalar",
-                            fontSize = 16.sp,
+                            text = "📊 Haftalık Kategori Harcamaları",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 12.dp)
                         )
                         
                         AndroidView(
@@ -228,6 +353,7 @@ fun DashboardScreen(
                                     description.isEnabled = false
                                     setDrawGridBackground(false)
                                     legend.isEnabled = true
+                                    setPinchZoom(false)
                                     setDrawBarShadow(false)
                                     setDrawValueAboveBar(true)
                                     
@@ -247,29 +373,29 @@ fun DashboardScreen(
                                     axisRight.isEnabled = false
                                 }
                             },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
                             update = { chart ->
                                 val entries = state.weeklyExpenses.values.mapIndexed { index, value ->
                                     BarEntry(index.toFloat(), value.toFloat())
                                 }
                                 
-                                val dataSet = BarDataSet(entries, "Harcama (₺)").apply {
+                                val dataSet = BarDataSet(entries, "Harcama").apply {
                                     colors = ColorTemplate.MATERIAL_COLORS.toList()
                                     valueTextSize = 12f
                                 }
                                 
                                 chart.data = BarData(dataSet)
                                 chart.invalidate()
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
+                            }
                         )
                     }
                 }
             }
         }
 
-        // Pasta Grafiği (Kategori Dağılımı)
+        // Harcama Dağılımı Pasta Grafiği
         if (state.weeklyExpenses.isNotEmpty()) {
             item {
                 Card(
@@ -279,10 +405,10 @@ fun DashboardScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Harcama Dağılımı",
-                            fontSize = 16.sp,
+                            text = "🥧 Harcama Dağılımı",
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 12.dp)
                         )
                         
                         AndroidView(
@@ -293,26 +419,26 @@ fun DashboardScreen(
                                     legend.isEnabled = true
                                     setDrawEntryLabels(true)
                                     setEntryLabelTextSize(12f)
-                                    setEntryLabelColor(android.graphics.Color.WHITE)
+                                    setEntryLabelColor(android.graphics.Color.BLACK)
                                 }
                             },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
                             update = { chart ->
-                                val entries = state.weeklyExpenses.map { (category, amount) ->
-                                    PieEntry(amount.toFloat(), category)
+                                val entries = state.weeklyExpenses.values.mapIndexed { index, value ->
+                                    PieEntry(value.toFloat(), state.weeklyExpenses.keys.elementAt(index))
                                 }
                                 
                                 val dataSet = PieDataSet(entries, "Kategoriler").apply {
                                     colors = ColorTemplate.MATERIAL_COLORS.toList()
-                                    valueTextSize = 12f
+                                    valueTextSize = 14f
                                     valueFormatter = PercentFormatter(chart)
                                 }
                                 
                                 chart.data = PieData(dataSet)
                                 chart.invalidate()
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
+                            }
                         )
                     }
                 }
@@ -320,27 +446,52 @@ fun DashboardScreen(
         }
 
         // Son İşlemler
-        if (state.transactions.isNotEmpty()) {
-            item {
-                Text(
-                    text = "Son İşlemler",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
+        item {
+            Text(
+                text = "📋 Son İşlemler",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
 
-            items(
-                items = state.transactions.sortedByDescending { it.date }.take(5),
-                key = { it.id }
-            ) { transaction ->
+        if (state.recentTransactions.isEmpty()) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "📝",
+                            fontSize = 48.sp
+                        )
+                        Text(
+                            text = "Henüz işlem bulunmuyor",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                        Text(
+                            text = "İlk harcamanızı eklemek için 'Harcama Ekle' butonunu kullanın",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
+            }
+        } else {
+            items(state.recentTransactions.take(5)) { transaction ->
                 Card(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -349,25 +500,38 @@ fun DashboardScreen(
                         ) {
                             Text(
                                 text = transaction.title,
-                                fontSize = 14.sp,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
                                 text = transaction.categoryName,
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(transaction.date),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         
-                        Text(
-                            text = "₺${String.format("%.2f", transaction.amount)}",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (transaction.amount >= 0) 
-                                MaterialTheme.colorScheme.primary 
-                            else 
-                                MaterialTheme.colorScheme.error
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = if (transaction.type == "INCOME") "📈" else "📉",
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = "₺${String.format("%.2f", transaction.amount)}",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (transaction.type == "INCOME") 
+                                    MaterialTheme.colorScheme.primary 
+                                else 
+                                    MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }
@@ -376,11 +540,20 @@ fun DashboardScreen(
         // Loading State
         if (state.isLoading) {
             item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                Card(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    CircularProgressIndicator()
+                    Column(
+                        modifier = Modifier.padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            text = "Veriler yükleniyor...",
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -393,11 +566,22 @@ fun DashboardScreen(
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 ) {
-                    Text(
-                        text = error,
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "❌ Hata",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                        Text(
+                            text = error,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
                 }
             }
         }

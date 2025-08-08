@@ -35,6 +35,11 @@ class DashboardViewModel(
                 val totalExpense = transactions.filter { it.amount < 0 }.sumOf { -it.amount }
                 val totalBalance = totalIncome - totalExpense
                 
+                // Son işlemleri al (en son 5 işlem)
+                val recentTransactions = transactions
+                    .sortedByDescending { it.date }
+                    .take(5)
+                
                 // Haftalık verileri hesapla
                 val weeklyData = calculateWeeklyData(transactions)
                 
@@ -42,6 +47,7 @@ class DashboardViewModel(
                     it.copy(
                         isLoading = false,
                         transactions = transactions,
+                        recentTransactions = recentTransactions,
                         categories = categories,
                         totalBalance = totalBalance,
                         totalIncome = totalIncome,
