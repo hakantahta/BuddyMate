@@ -8,6 +8,7 @@ import com.example.budyymate.data.local.dao.CategoryDao
 import com.example.budyymate.data.repository.BudgetRepositoryImpl
 import com.example.budyymate.domain.repository.BudgetRepository
 import com.example.budyymate.domain.usecase.*
+import com.example.budyymate.presentation.viewmodel.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -38,4 +39,15 @@ val appModule = module {
     factory { GetCategoriesUseCase(get()) }
 
     factory { AddCategoryUseCase(get()) }
+
+    // ViewModels
+    factory { DashboardViewModel(get(), get()) }
+    
+    factory { TransactionsViewModel(get()) }
+    
+    factory { CategoriesViewModel(get(), get()) }
+    
+    factory { AddTransactionViewModel(get(), get()) }
+    
+    factory { SettingsViewModel() }
 }

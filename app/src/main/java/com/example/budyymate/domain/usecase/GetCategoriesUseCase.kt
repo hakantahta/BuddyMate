@@ -2,8 +2,8 @@ package com.example.budyymate.domain.usecase
 
 import com.example.budyymate.domain.model.Category
 import com.example.budyymate.domain.repository.BudgetRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 
 class GetCategoriesUseCase(private val repository: BudgetRepository) {
-    operator fun invoke(): Flow<List<Category>> = repository.getCategories()
+    suspend operator fun invoke(): List<Category> = repository.getCategories().first()
 }
