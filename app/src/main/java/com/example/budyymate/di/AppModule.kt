@@ -3,8 +3,9 @@ package com.example.budyymate.di
 import android.content.Context
 import androidx.room.Room
 import com.example.budyymate.data.local.BudgetDatabase
-import com.example.budyymate.data.local.dao.TransactionDao
 import com.example.budyymate.data.local.dao.CategoryDao
+import com.example.budyymate.data.local.dao.TransactionDao
+import com.example.budyymate.data.local.datastore.UserPreferencesManager
 import com.example.budyymate.data.repository.BudgetRepositoryImpl
 import com.example.budyymate.domain.repository.BudgetRepository
 import com.example.budyymate.domain.usecase.*
@@ -40,14 +41,17 @@ val appModule = module {
 
     factory { AddCategoryUseCase(get()) }
 
+    // UserPreferencesManager
+    single { UserPreferencesManager(androidContext()) }
+
     // ViewModels
     factory { DashboardViewModel(get(), get()) }
-    
+
     factory { TransactionsViewModel(get()) }
-    
+
     factory { CategoriesViewModel(get(), get()) }
-    
+
     factory { AddTransactionViewModel(get(), get()) }
-    
-    factory { SettingsViewModel() }
+
+    factory { SettingsViewModel(get()) }
 }
